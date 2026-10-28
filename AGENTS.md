@@ -1,123 +1,164 @@
-<laravel-boost-guidelines>
-=== foundation rules ===
+# GitHub Copilot Instructions: Laravel MVC & Blade
 
-# Laravel Boost Guidelines
+## 1. Stack & Environment
+- **Framework:** Laravel (Latest stable version)
+- **Architecture:** Standard MVC (Model-View-Controller). Use Service/Action classes when logic expands beyond basic CRUD.
+- **Templating Engine:** Blade + Bootstrap 5 / CSS (with Alpine.js for lightweight client-side interactivity).
+- **Database:** Eloquent ORM, Migrations, Factories, and Seeders.
+- **Language:** PHP 8.x with strict typing enabled (`declare(strict_types=1);`).
 
-## Foundational Context
+---
 
-This application is a Laravel application running on PHP 8.5. Always use the APIs that match the installed major version of each package — do not assume a version.
+## 2. Coding Standards & Conventions
+- Adhere strictly to **PSR-12** standards and standard Laravel conventions:
+  - **PascalCase:** Models, Controllers, Services, Actions, Blade Components.
+  - **camelCase:** Methods, variables, routes names.
+  - **snake_case:** Database tables, column names, foreign keys, Blade view filenames.
+  - **kebab-case:** HTML attributes, URL paths, CSS classes.
+- Declare strict types at the top of every PHP file: `declare(strict_types=1);`.
+- Use explicit type hints for arguments and return types on all methods.
 
-Before relying on a package's API, confirm its installed version:
-- PHP packages: run `composer show --direct` to list direct dependencies with versions, or `composer show <vendor/package>` for a single package.
-- JS packages: check `package.json` for the installed versions.
+---
 
-## Conventions
+## 3. Controllers & Routing
+- Keep Controllers **thin**. Delegate complex business logic to dedicated Service or Action classes.
+- Use **Form Requests** (`php artisan make:request`) for validation and authorization rather than validating inline within controllers.
+- Use **Route Model Binding** whenever possible.
+- Return explicit response types (`View`, `RedirectResponse`, `JsonResponse`).
 
-- You must follow all existing code conventions used in this application. When creating or editing a file, check sibling files for the correct structure, approach, and naming.
-- Use descriptive names for variables and methods. For example, `isRegisteredForDiscounts`, not `discount()`.
-- Check for existing components to reuse before writing a new one.
+```php
+// Example Controller Standard
+declare(strict_types=1);
 
-## Verification Scripts
+namespace App\Http\Controllers;
 
-- Do not create verification scripts or tinker when tests cover that functionality and prove they work. Unit and feature tests are more important.
+use App\Http\Requests\UpdateUserRequest;
+use App\Models\User;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
-## Application Structure & Architecture
+class UserController extends Controller
+{
+    public function edit(User $user): View
+    {
+        return view('users.edit', compact('user'));
+    }
 
-- Stick to existing directory structure; don't create new base folders without approval.
-- Do not change the application's dependencies without approval.
+    public function update(UpdateUserRequest $request, User $user): RedirectResponse
+    {
+        $user->update($request->validated());
 
-## Frontend Bundling
+        return redirect()
+            ->route('users.index')
+            ->with('success', __('User updated successfully.'));
+    }
+}
+```
 
-- If a frontend change doesn't show in the UI or you get a "Unable to locate file in Vite manifest" error, run `npm run build` or ask the user to run `npm run dev` or `composer run dev`.
+---
 
-## Documentation Files
+## 4. Models & Eloquent ORM
+- Always define explicit `$fillable` attributes on Eloquent models to guard against mass-assignment vulnerabilities.
+- Explicitly define standard relationships (`hasMany`, `belongsTo`, `belongsToMany`) with type declarations.
+- Avoid **N+1 query issues** by eagerly loading relations using `with()` in controllers or repository methods.
+- For constrained eager-load callbacks passed to `with()` or `load()`, type the argument as the relationship instance (for example, `BelongsTo`), not `Builder`.
+- Use Eloquent Scopes for repeated query constraints.
 
-- You must only create documentation files if explicitly requested by the user.
+```php
+// Example Model Standard
+declare(strict_types=1);
 
-=== boost rules ===
+namespace App\Models;
 
-# Laravel Boost
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-## Project Rules
+class Post extends Model
+{
+    protected $fillable = [
+        'title',
+        'slug',
+        'content',
+        'is_published',
+        'user_id',
+    ];
 
-- This project contains committed, area-grouped rules in `.ai/rules` when that directory exists, including path-scoped framework guidelines under `.ai/rules/boost`. Before you enter plan mode or create/edit any file, you MUST first: open @.ai/rules/index.md (it maps file globs to rule files), read every rule file whose globs cover the path(s) in scope, and run `grep -rin 'keyword' .ai/rules` to catch what a path match alone misses. Do not write code until you have read and are following every matching rule. If `.ai/rules` does not exist, continue without it.
+    protected $casts = [
+        'is_published' => 'boolean',
+    ];
 
-## Artisan
+    public function comments(): HasMany
+    {
+        return $this->hasMany(Comment::class);
+    }
 
-- Run Artisan commands directly via the command line (e.g., `php artisan route:list`). Use `php artisan list` to discover available commands and `php artisan [command] --help` to check parameters.
-- Inspect routes with `php artisan route:list`. Filter with: `--method=GET`, `--name=users`, `--path=api`, `--except-vendor`, `--only-vendor`.
-- Read configuration values using dot notation: `php artisan config:show app.name`, `php artisan config:show database.default`. Or read config files directly from the `config/` directory.
+    public function scopePublished(Builder $query): Builder
+    {
+        return $query->where('is_published', true);
+    }
+}
+```
 
-## Tinker
+---
 
-- Execute PHP in app context for debugging and testing code. Do not create models without user approval, prefer tests with factories instead. Prefer existing Artisan commands over custom tinker code.
-- Always use single quotes to prevent shell expansion: `php artisan tinker --execute 'Your::code();'`
-  - Double quotes for PHP strings inside: `php artisan tinker --execute 'User::where("active", true)->count();'`
+## 5. Blade Templates & UI Component Structure
+- Use **Blade Anonymous Components** (`<x-component-name />`) or Class-based Components for reusable UI elements.
+- Maintain layout structures using modern `<x-layout>` tags rather than legacy `@extends` where feasible.
+- Keep Blade views clean: zero database queries or heavy calculations inside views.
+- Escape all output by default (`{{ $variable }}`). Use `{!! $variable !!}` only when HTML is explicitly trusted and sanitized.
+- Always include `@csrf` in HTML forms submitting via `POST`, `PUT`, `PATCH`, or `DELETE`.
 
-=== php rules ===
+```html
+{{-- Example Layout Component Usage --}}
+<x-app-layout>
+    <x-slot:title>
+        {{ __('User Profile') }}
+    </x-slot:title>
 
-# PHP
+    <div class="max-w-4xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <h1 class="text-xl font-semibold text-gray-900">{{ $user->name }}</h1>
 
-- Always use curly braces for control structures, even for single-line bodies.
-- Use PHP 8 constructor property promotion: `public function __construct(public GitHub $github) { }`. Do not leave empty zero-parameter `__construct()` methods unless the constructor is private.
-- Use explicit return type declarations and type hints for all method parameters: `function isAccessible(User $user, ?string $path = null): bool`
-- Use TitleCase for Enum keys: `FavoritePerson`, `BestLake`, `Monthly`.
-- Prefer PHPDoc blocks over inline comments. Only add inline comments for exceptionally complex logic.
-- Use array shape type definitions in PHPDoc blocks.
+        <form action="{{ route('users.update', $user) }}" method="POST" class="mt-4 space-y-4">
+            @csrf
+            @method('PUT')
 
-=== deployments rules ===
+            <x-input name="email" :value="$user->email" label="Email Address" />
+            <x-button type="submit">
+                {{ __('Save Changes') }}
+            </x-button>
+        </form>
+    </div>
+</x-app-layout>
+```
 
-# Deployment
+---
 
-- Laravel can be deployed using [Laravel Cloud](https://cloud.laravel.com/), which is the fastest way to deploy and scale production Laravel applications.
+## 6. Security & Authorization
+- Use Laravel **Policies** and **Gates** for handling access control (`$this->authorize('update', $user)` or `@can('update', $user)`).
+- Never use raw SQL queries without parameter binding.
+- Sanitize and validate all incoming request parameters strictly via Request classes.
+- Use **hashed passwords** and never store plain text passwords.
+- Enable **CSRF protection** for all state-changing requests.
+- Regularly update dependencies to patch known security vulnerabilities.
+- Limit sensitive data exposure in logs and error messages.
 
-=== laravel/core rules ===
+## 7. Project Domain
+MVP inventory system for hygiene products.
+Scope: `Category`, `Product`, `StockMovement`. Do not scaffold modules outside this scope.
 
-# Do Things the Laravel Way
+## 8. Language Rules
+- Code in English (classes, variables, methods, DB, routes, comments).
+- UI in Spanish (Blade copy, labels, flash messages, validation messages).
+- Validation messages live in `lang/es/validation.php`.
 
-- Use `php artisan make:` commands to create new files (i.e. migrations, controllers, models, etc.). You can list available Artisan commands using `php artisan list` and check their parameters with `php artisan [command] --help`.
-- If you're creating a generic PHP class, use `php artisan make:class`.
-- Pass `--no-interaction` to all Artisan commands to ensure they work without user input. You should also pass the correct `--options` to ensure correct behavior.
+## 9. Soft Deletes
+- Apply `SoftDeletes` to every entity.
+- Migrations must include `$table->softDeletes()`.
+- Unique constraints (`sku`, `slug`) must account for soft-deleted rows.
 
-### Model Creation
-
-- When creating new models, create useful factories and seeders for them too. Ask the user if they need any other things, using `php artisan make:model --help` to check the available options.
-
-## APIs & Eloquent Resources
-
-- For APIs, default to using Eloquent API Resources and API versioning unless existing API routes do not, then you should follow existing application convention.
-
-## URL Generation
-
-- When generating links to other pages, prefer named routes and the `route()` function.
-
-## Testing
-
-- When creating models for tests, use the factories for the models. Check if the factory has custom states that can be used before manually setting up the model.
-- Faker: Use methods such as `$this->faker->word()` or `fake()->randomDigit()`. Follow existing conventions whether to use `$this->faker` or `fake()`.
-- When creating tests, make use of `php artisan make:test [options] {name}` to create a feature test, and pass `--unit` to create a unit test. Most tests should be feature tests.
-
-=== pint/core rules ===
-
-# Laravel Pint Code Formatter
-
-- If you have modified any PHP files, you must run `vendor/bin/pint --dirty --format agent` before finalizing changes to ensure your code matches the project's expected style.
-- Do not run `vendor/bin/pint --test --format agent`, simply run `vendor/bin/pint --format agent` to fix any formatting issues.
-
-=== pest/core rules ===
-
-# Pest
-
-- This project uses Pest. Create tests with `php artisan make:test --pest {name}`.
-- Do not include the test suite directory in `{name}`. Use `SomeFeatureTest`, not `Feature/SomeFeatureTest`.
-- Read the `testing-best-practices` skill for guidance on coverage, naming, structure, dependency isolation, and review.
-- Do not delete tests or test files without approval. They are part of the application.
-
-## Running Tests
-
-- Run the narrowest set of tests that covers the change. Pass a file path or `--filter=testName` to `php artisan test --compact`.
-- Rerun a test after each change to it.
-- Run `vendor/bin/pest` to call the test runner directly. It accepts the same file path and `--filter=testName` arguments.
-- After the feature tests pass, ask the user to run the complete suite with `php artisan test --compact`.
-
-</laravel-boost-guidelines>
+## 10. Out of Scope (do not add unless asked)
+- Auth, users, roles, permissions
+- API endpoints
+- Tests
+- Docker / CI
