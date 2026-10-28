@@ -8,7 +8,11 @@
             <h1 class="h2 mb-1">Categorías</h1>
             <p class="text-secondary mb-0">Organiza los productos del inventario.</p>
         </div>
-        <a class="btn btn-primary" href="{{ route('categories.create') }}">Nueva categoría</a>
+        <div class="d-flex flex-wrap gap-2">
+            <a class="btn btn-outline-danger" href="{{ route('categories.export.pdf') }}">Exportar PDF</a>
+            <a class="btn btn-outline-success" href="{{ route('categories.export') }}">Exportar Excel</a>
+            <a class="btn btn-primary" href="{{ route('categories.create') }}">Nueva categoría</a>
+        </div>
     </div>
 
     <div class="card border-0 shadow-sm">

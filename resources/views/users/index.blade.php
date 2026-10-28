@@ -8,7 +8,11 @@
             <h1 class="h2 mb-1">Usuarios</h1>
             <p class="text-secondary mb-0">Administra las cuentas de acceso al inventario.</p>
         </div>
-        <a class="btn btn-primary" href="{{ route('users.create') }}">Crear usuario</a>
+        <div class="d-flex flex-wrap gap-2">
+            <a class="btn btn-outline-danger" href="{{ route('users.export.pdf') }}">Exportar PDF</a>
+            <a class="btn btn-outline-success" href="{{ route('users.export') }}">Exportar Excel</a>
+            <a class="btn btn-primary" href="{{ route('users.create') }}">Crear usuario</a>
+        </div>
     </div>
 
     <div class="card border-0 shadow-sm">

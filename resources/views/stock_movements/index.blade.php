@@ -8,7 +8,11 @@
             <h1 class="h2 mb-1">Movimientos de stock</h1>
             <p class="text-secondary mb-0">Consulta el historial de entradas y salidas.</p>
         </div>
-        <a class="btn btn-primary" href="{{ route('stock-movements.create') }}">Registrar movimiento</a>
+        <div class="d-flex flex-wrap gap-2">
+            <a class="btn btn-outline-danger" href="{{ route('stock-movements.export.pdf') }}">Exportar PDF</a>
+            <a class="btn btn-outline-success" href="{{ route('stock-movements.export') }}">Exportar Excel</a>
+            <a class="btn btn-primary" href="{{ route('stock-movements.create') }}">Registrar movimiento</a>
+        </div>
     </div>
 
     <div class="card border-0 shadow-sm">

@@ -4,13 +4,18 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Exports\CategoriesExport;
 use App\Http\Requests\CategoryRequest;
 use App\Http\Requests\UpdateCategoryRequest;
 use App\Models\Category;
 use App\Models\Product;
+use App\Services\PdfReportService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class CategoryController extends Controller
 {
@@ -22,6 +27,23 @@ class CategoryController extends Controller
             ->paginate(15);
 
         return view('categories.index', compact('categories'));
+    }
+
+    public function export(): BinaryFileResponse
+    {
+        return Excel::download(
+            new CategoriesExport,
+            'reportes_categorias_'.now()->format('Y-m-d').'.xlsx',
+        );
+    }
+
+    public function exportPdf(PdfReportService $pdfReport): Response
+    {
+        return $pdfReport->download(
+            new CategoriesExport,
+            'Reporte de categorías',
+            'reportes_categorias_'.now()->format('Y-m-d').'.pdf',
+        );
     }
 
     public function create(): View

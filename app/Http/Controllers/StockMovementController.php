@@ -5,14 +5,19 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Enums\StockMovementType;
+use App\Exports\StockMovementsExport;
 use App\Http\Requests\StoreStockMovementRequest;
 use App\Http\Requests\UpdateStockMovementRequest;
 use App\Models\Product;
 use App\Models\StockMovement;
+use App\Services\PdfReportService;
 use App\Services\StockMovementService;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Response;
 use Illuminate\View\View;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class StockMovementController extends Controller
 {
@@ -32,6 +37,23 @@ class StockMovementController extends Controller
             ->paginate(15);
 
         return view('stock_movements.index', compact('stockMovements'));
+    }
+
+    public function export(): BinaryFileResponse
+    {
+        return Excel::download(
+            new StockMovementsExport,
+            'reportes_movimientos_'.now()->format('Y-m-d').'.xlsx',
+        );
+    }
+
+    public function exportPdf(PdfReportService $pdfReport): Response
+    {
+        return $pdfReport->download(
+            new StockMovementsExport,
+            'Reporte de movimientos',
+            'reportes_movimientos_'.now()->format('Y-m-d').'.pdf',
+        );
     }
 
     public function create(): View

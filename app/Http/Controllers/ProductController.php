@@ -4,16 +4,21 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Exports\ProductsExport;
 use App\Http\Requests\IndexProductRequest;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Models\Category;
 use App\Models\Product;
+use App\Services\PdfReportService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Response;
 use Illuminate\View\View;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ProductController extends Controller
 {
@@ -35,6 +40,25 @@ class ProductController extends Controller
         $categories = Category::query()->orderBy('name')->get();
 
         return view('products.index', compact('products', 'categories', 'categoryId'));
+    }
+
+    public function export(IndexProductRequest $request): BinaryFileResponse
+    {
+        $categoryId = $request->validated('category_id');
+        $export = new ProductsExport($categoryId === null ? null : (int) $categoryId);
+
+        return Excel::download($export, 'reportes_productos_'.now()->format('Y-m-d').'.xlsx');
+    }
+
+    public function exportPdf(IndexProductRequest $request, PdfReportService $pdfReport): Response
+    {
+        $categoryId = $request->validated('category_id');
+
+        return $pdfReport->download(
+            new ProductsExport($categoryId === null ? null : (int) $categoryId),
+            'Reporte de productos',
+            'reportes_productos_'.now()->format('Y-m-d').'.pdf',
+        );
     }
 
     public function create(): View

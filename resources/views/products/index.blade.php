@@ -8,7 +8,17 @@
             <h1 class="h2 mb-1">Productos</h1>
             <p class="text-secondary mb-0">Consulta y administra el inventario.</p>
         </div>
-        <a class="btn btn-primary" href="{{ route('products.create') }}">Nuevo producto</a>
+        <div class="d-flex flex-wrap gap-2">
+            <a class="btn btn-outline-danger"
+               href="{{ $categoryId ? route('products.export.pdf', ['category_id' => $categoryId]) : route('products.export.pdf') }}">
+                Exportar PDF
+            </a>
+            <a class="btn btn-outline-success"
+               href="{{ $categoryId ? route('products.export', ['category_id' => $categoryId]) : route('products.export') }}">
+                Exportar Excel
+            </a>
+            <a class="btn btn-primary" href="{{ route('products.create') }}">Nuevo producto</a>
+        </div>
     </div>
 
     <section class="card border-0 shadow-sm mb-4" aria-label="Filtro de productos">
