@@ -62,7 +62,7 @@ Las migraciones existentes incluyen tablas para usuarios, cache y jobs. Confirma
    - Usar el dominio real del sitio y `reverse_proxy 127.0.0.1:8080`.
    - Validar y recargar Caddy después de cada cambio.
 6. **Verificar proxy HTTPS y producción**
-   - Confirmar que Laravel detecte el esquema HTTPS detrás de Caddy para generar URLs y cookies seguras.
+   - Confiar en los encabezados `X-Forwarded-*` que Caddy envía para que Laravel detecte HTTPS, genere URLs correctas y marque las cookies de sesión como seguras.
    - Revisar `APP_DEBUG=false`, `APP_ENV=production`, `APP_URL=https://<dominio>` y permisos de `storage`/`bootstrap/cache`.
    - No ejecutar `composer setup` en producción: ese script instala dependencias, genera una clave y ejecuta migraciones durante la preparación, lo cual no es apropiado para el ciclo de build de la imagen.
 
@@ -88,6 +88,7 @@ APP_NAME="BB Inventory"
 APP_ENV=production
 APP_DEBUG=false
 APP_URL=https://<dominio>
+SESSION_SECURE_COOKIE=true
 APP_KEY=<clave-generada-una-sola-vez>
 
 DB_CONNECTION=mysql
@@ -138,6 +139,8 @@ Añadir un sitio para el dominio en el `Caddyfile` del host:
     reverse_proxy 127.0.0.1:8080
 }
 ```
+
+Caddy termina TLS y reenvía `X-Forwarded-Proto` a Laravel. La aplicación confía en esos encabezados; por eso, publica el puerto del contenedor únicamente en `127.0.0.1` como se muestra arriba y no expongas directamente el puerto HTTP del contenedor a Internet. `APP_URL` debe usar el dominio HTTPS real y `SESSION_SECURE_COOKIE=true` evita enviar la cookie de sesión por HTTP.
 
 Validar la configuración y recargar Caddy según el método de instalación usado. Comprobar que Caddy obtiene el certificado TLS y que el acceso externo usa HTTPS.
 
