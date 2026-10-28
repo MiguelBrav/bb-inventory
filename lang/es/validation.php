@@ -5,6 +5,11 @@ declare(strict_types=1);
 return [
     'required' => 'El campo :attribute es obligatorio.',
     'string' => 'El campo :attribute debe ser texto.',
+    'email' => 'El campo :attribute debe ser una dirección de correo válida.',
+    'lowercase' => 'El campo :attribute debe estar en minúsculas.',
+    'confirmed' => 'La confirmación de :attribute no coincide.',
+    'unique' => 'El valor de :attribute ya está en uso.',
+    'current_password' => 'La contraseña actual no es correcta.',
     'integer' => 'El campo :attribute debe ser un número entero.',
     'numeric' => 'El campo :attribute debe ser numérico.',
     'date' => 'El campo :attribute no es una fecha válida.',
@@ -25,6 +30,10 @@ return [
         'type' => 'tipo de movimiento',
         'quantity' => 'cantidad',
         'reason' => 'motivo',
+        'email' => 'correo electrónico',
+        'password' => 'contraseña',
+        'password_confirmation' => 'confirmación de contraseña',
+        'current_password' => 'contraseña actual',
     ],
     'stock_movement' => [
         'quantity_positive' => 'La cantidad debe ser mayor que cero.',

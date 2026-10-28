@@ -15,6 +15,8 @@ class CategorySeeder extends Seeder
             'Higiene personal',
             'Limpieza del hogar',
             'Papel y desechables',
+            'Cuidado capilar',
+            'Cuidado bucal',
         ] as $name) {
             Category::query()->firstOrCreate(['name' => $name]);
         }

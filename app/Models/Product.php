@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Support\UniqueSuffix;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -46,6 +47,11 @@ class Product extends Model
             'sale_price' => 'decimal:2',
             'expiration_date' => 'date',
         ];
+    }
+
+    public function scopeLowStock(Builder $query): Builder
+    {
+        return $query->whereColumn('stock', '<=', 'min_stock');
     }
 
     public function category(): BelongsTo

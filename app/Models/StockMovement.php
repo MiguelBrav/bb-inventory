@@ -18,6 +18,7 @@ class StockMovement extends Model
         'type',
         'quantity',
         'reason',
+        'user_id',
     ];
 
     protected function casts(): array
@@ -31,5 +32,10 @@ class StockMovement extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

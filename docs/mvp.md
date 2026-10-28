@@ -31,7 +31,7 @@
 5. **Form Requests de productos:** StoreProductRequest y UpdateProductRequest con reglas básicas (SKU requerido, precios válidos, etc.). Los SKU duplicados deben resolverse agregando un sufijo, no rechazarse.
 6. **Vistas Blade de productos:** index, create, edit y show con Bootstrap 5, layout base y alerta visual de stock bajo.
 7. **Movimientos de stock:** StockMovementController y rutas para visualizar, registrar, actualizar y cancelar movimientos; StoreStockMovementRequest y UpdateStockMovementRequest; vistas index, create, edit y show con acción de cancelación.
-8. **Seeders:** CategorySeeder (3 categorías) y ProductSeeder (5 productos de prueba).
+8. **Seeders:** CategorySeeder (5 categorías) y ProductSeeder (20 productos de prueba).
 
 ## Fuera de scope (no generar)
 - Autenticación, usuarios, roles
@@ -41,7 +41,7 @@
 
 ## Criterio de aceptación
 - `php artisan migrate:fresh --seed` corre sin errores.
-- `/products` muestra los 5 productos del seeder con paginación.
+- `/products` muestra los 20 productos del seeder con paginación.
 - SKU duplicado en `store` se guarda con un sufijo numérico disponible y permanece único en la base de datos.
 - Un slug de categoría duplicado se guarda con un sufijo numérico disponible y permanece único en la base de datos.
 - Registrar y actualizar movimientos ajusta correctamente el stock del producto; cancelar un movimiento lo soft-deletea y revierte su efecto.

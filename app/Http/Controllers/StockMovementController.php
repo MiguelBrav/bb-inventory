@@ -49,14 +49,15 @@ class StockMovementController extends Controller
             StockMovementType::from($data['type']),
             (int) $data['quantity'],
             $data['reason'],
+            (int) $request->user()->getKey(),
         );
 
         return redirect()
-            ->route('stock-movements.show', $movement)
+            ->route('stock-movements.edit', $movement)
             ->with('success', 'Movimiento registrado correctamente.');
     }
 
-    public function show(StockMovement $stockMovement): View
+    public function edit(StockMovement $stockMovement): View
     {
         $stockMovement->load([
             'product' => static function (BelongsTo $product): void {
@@ -67,12 +68,6 @@ class StockMovementController extends Controller
                 ]);
             },
         ]);
-
-        return view('stock_movements.show', compact('stockMovement'));
-    }
-
-    public function edit(StockMovement $stockMovement): View
-    {
         $products = Product::query()->orderBy('name')->get();
 
         return view('stock_movements.edit', compact('stockMovement', 'products'));
@@ -92,7 +87,7 @@ class StockMovementController extends Controller
         );
 
         return redirect()
-            ->route('stock-movements.show', $movement)
+            ->route('stock-movements.edit', $movement)
             ->with('success', 'Movimiento actualizado correctamente.');
     }
 

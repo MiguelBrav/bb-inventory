@@ -35,7 +35,7 @@
                                     <span class="badge text-bg-secondary">Eliminado</span>
                                 @else
                                     <a class="text-decoration-none"
-                                       href="{{ route('products.show', $stockMovement->product) }}">
+                                       href="{{ route('products.edit', $stockMovement->product) }}">
                                         {{ $stockMovement->product->name }}
                                     </a>
                                 @endif
@@ -52,12 +52,17 @@
                             @endif
                         </td>
                         <td>{{ $stockMovement->quantity }}</td>
-                        <td>{{ $stockMovement->reason }}</td>
+                        <td>{{ $stockMovement->reason }}                        </td>
                         <td class="text-end text-nowrap">
-                            <a class="btn btn-sm btn-outline-secondary"
-                               href="{{ route('stock-movements.show', $stockMovement) }}">Ver</a>
                             <a class="btn btn-sm btn-outline-primary"
                                href="{{ route('stock-movements.edit', $stockMovement) }}">Editar</a>
+                            <form class="d-inline" method="POST"
+                                  action="{{ route('stock-movements.destroy', $stockMovement) }}"
+                                  onsubmit="return confirm('¿Cancelar este movimiento? El stock se actualizará para revertirlo.')">
+                                @csrf
+                                @method('DELETE')
+                                <button class="btn btn-sm btn-outline-danger" type="submit">Cancelar</button>
+                            </form>
                         </td>
                     </tr>
                 @empty

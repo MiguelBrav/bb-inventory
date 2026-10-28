@@ -18,10 +18,11 @@ final class StockMovementService
         StockMovementType $type,
         int $quantity,
         string $reason,
+        int $userId,
     ): StockMovement {
         $this->validateQuantity($quantity);
 
-        return DB::transaction(function () use ($productId, $type, $quantity, $reason): StockMovement {
+        return DB::transaction(function () use ($productId, $type, $quantity, $reason, $userId): StockMovement {
             $product = Product::query()->lockForUpdate()->findOrFail($productId);
 
             $this->applyEffect($product, $type, $quantity);
@@ -30,6 +31,7 @@ final class StockMovementService
                 'type' => $type,
                 'quantity' => $quantity,
                 'reason' => $reason,
+                'user_id' => $userId,
             ]);
         }, 3);
     }
@@ -71,7 +73,7 @@ final class StockMovementService
             $nextProduct = $products->get($productId);
 
             if (! $previousProduct instanceof Product || ! $nextProduct instanceof Product) {
-                throw (new ModelNotFoundException())->setModel(Product::class, $productIds);
+                throw (new ModelNotFoundException)->setModel(Product::class, $productIds);
             }
 
             if ($nextProduct->trashed()) {

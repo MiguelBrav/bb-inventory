@@ -25,7 +25,7 @@
 
 ### 5. Crear los seeders
 - Archivos: `CategorySeeder`, `ProductSeeder` y ajustes puntuales al seeder principal, si son necesarios.
-- Insertar 3 categorías y 5 productos de prueba.
+- Insertar 5 categorías y 20 productos de prueba.
 - **Dependencias:** pasos 1 y 2; `ProductSeeder` requiere categorías existentes.
 
 ### 6. Crear las vistas Blade

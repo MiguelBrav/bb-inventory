@@ -53,9 +53,7 @@
                     <tr @class(['table-warning' => $lowStock])>
                         <td class="text-nowrap">{{ $product->sku }}</td>
                         <td>
-                            <a class="fw-semibold text-decoration-none" href="{{ route('products.show', $product) }}">
-                                {{ $product->name }}
-                            </a>
+                            <span class="fw-semibold">{{ $product->name }}</span>
                             @if ($lowStock)
                                 <span class="badge text-bg-warning ms-1">Stock bajo</span>
                             @endif
@@ -65,7 +63,6 @@
                         <td>${{ number_format((float) $product->sale_price, 2, ',', '.') }}</td>
                         <td>{{ $product->expiration_date?->format('d/m/Y') ?? '—' }}</td>
                         <td class="text-end text-nowrap">
-                            <a class="btn btn-sm btn-outline-primary" href="{{ route('products.show', $product) }}">Ver</a>
                             <a class="btn btn-sm btn-outline-primary" href="{{ route('products.edit', $product) }}">Editar</a>
                             <form class="d-inline" method="POST" action="{{ route('products.destroy', $product) }}"
                                   onsubmit="return confirm('¿Eliminar este producto?')">

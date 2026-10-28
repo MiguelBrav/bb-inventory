@@ -29,24 +29,19 @@ class CategoryController extends Controller
         return view('categories.create');
     }
 
-    public function show(Category $category): View
-    {
-        $category->loadCount('products');
-
-        return view('categories.show', compact('category'));
-    }
-
     public function store(CategoryRequest $request): RedirectResponse
     {
-        Category::query()->create($request->validated());
+        $category = Category::query()->create($request->validated());
 
         return redirect()
-            ->route('categories.index')
+            ->route('categories.edit', $category)
             ->with('success', 'Categoría creada correctamente.');
     }
 
     public function edit(Category $category): View
     {
+        $category->loadCount('products');
+
         return view('categories.edit', compact('category'));
     }
 
@@ -57,7 +52,7 @@ class CategoryController extends Controller
         $category->update($request->validated());
 
         return redirect()
-            ->route('categories.index')
+            ->route('categories.edit', $category)
             ->with('success', 'Categoría actualizada correctamente.');
     }
 

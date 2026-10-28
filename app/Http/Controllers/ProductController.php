@@ -11,6 +11,7 @@ use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -48,24 +49,20 @@ class ProductController extends Controller
         $product = Product::query()->create($request->validated());
 
         return redirect()
-            ->route('products.show', $product)
+            ->route('products.edit', $product)
             ->with('success', 'Producto creado correctamente.');
     }
 
-    public function show(Product $product): View
+    public function edit(Product $product): View
     {
         $product->load([
             'category' => static function (BelongsTo $category): void {
                 $category->withTrashed();
             },
-            'stockMovements',
+            'stockMovements' => static function (HasMany $stockMovements): void {
+                $stockMovements->latest()->limit(5);
+            },
         ]);
-
-        return view('products.show', compact('product'));
-    }
-
-    public function edit(Product $product): View
-    {
         $categories = Category::query()->orderBy('name')->get();
 
         return view('products.edit', compact('product', 'categories'));
@@ -76,7 +73,7 @@ class ProductController extends Controller
         $product->update($request->validated());
 
         return redirect()
-            ->route('products.show', $product)
+            ->route('products.edit', $product)
             ->with('success', 'Producto actualizado correctamente.');
     }
 

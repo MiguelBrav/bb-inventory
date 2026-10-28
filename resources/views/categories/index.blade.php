@@ -25,17 +25,10 @@
                 <tbody>
                 @forelse ($categories as $category)
                     <tr>
-                        <td>
-                            <a class="fw-semibold text-decoration-none"
-                               href="{{ route('categories.show', $category) }}">
-                                {{ $category->name }}
-                            </a>
-                        </td>
+                        <td class="fw-semibold">{{ $category->name }}</td>
                         <td class="text-secondary">{{ $category->slug }}</td>
                         <td>{{ $category->products_count }}</td>
                         <td class="text-end text-nowrap">
-                            <a class="btn btn-sm btn-outline-primary"
-                               href="{{ route('categories.show', $category) }}">Ver</a>
                             <a class="btn btn-sm btn-outline-primary"
                                href="{{ route('categories.edit', $category) }}">Editar</a>
                             <form class="d-inline" method="POST" action="{{ route('categories.destroy', $category) }}"

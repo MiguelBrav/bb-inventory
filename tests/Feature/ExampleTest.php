@@ -1,7 +1,8 @@
 <?php
 
-test('the application returns a successful response', function () {
-    $response = $this->get('/');
-
-    $response->assertStatus(200);
+test('guests must authenticate before accessing the inventory', function () {
+    $this->get('/')->assertRedirect(route('login'));
+    $this->get(route('products.index'))->assertRedirect(route('login'));
+    $this->get(route('login'))->assertOk()->assertSee('Iniciar sesión');
+    $this->get('/register')->assertNotFound();
 });
